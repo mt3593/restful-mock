@@ -1,4 +1,16 @@
-(ns restful-mock.request-response-pred)
+(ns restful-mock.request-response-pred
+  (:require [clojure.spec.alpha :as s]))
+
+(s/def :restful-mock/pred-request
+  (s/keys :opt-un [:ring.request/uri]))
+
+(s/def :restful-mock/mock-response
+  (s/keys :opt-un [:ring.response/status]))
+
+(s/def :restful-mock/list-of-mock-request-response-spec
+  (s/*
+   (s/cat :request :restful-mock/pred-request
+          :response :restful-mock/mock-response)))
 
 (defprotocol RequestResponsePred
   (my-request? [this request])
@@ -7,12 +19,12 @@
   (satisfied? [this])
   (get-raw-req-resp [this]))
 
-(defn match-request
+(defn- match-request
   [expected-request request]
   (= (:uri expected-request)
      (:uri (select-keys request (keys expected-request)))))
 
-(defrecord SimpleRequestResponsePred
+(defrecord ^:private SimpleRequestResponsePred
     [expected-request response called]
   RequestResponsePred
   (my-request? [this request]
@@ -27,10 +39,11 @@
   (get-raw-req-resp [this]
     [expected-request response]))
 
-(defn req-resp->fn
+(defn- req-resp->fn
   [[expected-request mock-response]]
   (->SimpleRequestResponsePred expected-request mock-response (atom 0)))
 
 (defn expected-calls-and-responses->req-resp-preds
   [expected-calls-and-responses]
+  {:pre [(s/valid? :restful-mock/list-of-mock-request-response-spec expected-calls-and-responses)]}
   (map req-resp->fn (partition 2 expected-calls-and-responses)))

@@ -1,11 +1,11 @@
 (ns restful-mock.handler-pred
   (:require [restful-mock.request-response-pred :refer [my-request? give-response]]))
 
-(defprotocol Handler
+(defprotocol ^:private Handler
   (get-unexpected-requests [this])
   (container-handler [this]))
 
-(defrecord SimpleHandler
+(defrecord ^:private SimpleHandler
     [req-resp-preds unexpected-requests]
   Handler
   (container-handler

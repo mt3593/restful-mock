@@ -10,20 +10,6 @@
 
 (def ^:dynamic *restful-port* 8081)
 
-(s/def :restful-mock/pred-request
-  (s/keys :opt-un [:ring.request/uri]))
-
-(s/def :restful-mock/mock-response
-  (s/keys :opt-un [:ring.response/status]))
-
-(s/def ::list-of-mock-request-response-spec
-  (s/*
-   (s/cat :request :restful-mock/pred-request
-          :response :restful-mock/mock-response)))
-
-(s/fdef rest-driven-fn
-        :args (s/cat ::list-of-mock-request-response-spec (s/coll-of fn?)))
-
 (defn rest-driven-fn
   [expected-calls-and-responses f]
   (let [server (atom nil)
