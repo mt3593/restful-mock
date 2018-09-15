@@ -2,7 +2,11 @@
   (:require [clojure.spec.alpha :as s]
             [ring.core.spec :as ring-spec]
             [ring.adapter.jetty :as jetty]
-            [restful-mock.handler-pred :refer [handler]]))
+            [restful-mock.handler-pred :refer [handler-component
+                                               container-handler
+                                               get-unexpected-requests
+                                               expected-calls-and-responses->req-resp-preds
+                                               satisfied?]]))
 
 (def ^:dynamic *restful-port* 8081)
 
@@ -22,11 +26,15 @@
 
 (defn rest-driven-fn
   [expected-calls-and-responses f]
-  (let [server (atom nil)]
+  (let [server (atom nil)
+        req-resp-pred (expected-calls-and-responses->req-resp-preds expected-calls-and-responses)
+        handler (handler-component req-resp-pred)]
     (try
-      (reset! server (jetty/run-jetty (handler expected-calls-and-responses)
+      (reset! server (jetty/run-jetty (container-handler handler)
                                       {:port *restful-port*
                                        :join? false}))
       (f)
+      [(filter #(not (satisfied? %)) req-resp-pred)
+       (get-unexpected-requests handler)]
       (finally
         (swap! server #(when % (.stop %)))))))
