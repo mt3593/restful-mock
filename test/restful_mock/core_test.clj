@@ -1,7 +1,7 @@
 (ns restful-mock.core-test
   (:require [clojure.test :refer :all]
             [restful-mock.core :refer :all]
-            [restful-mock.handler-pred :refer [get-raw-req-resp]]
+            [restful-mock.request-response-pred :refer [get-raw-req-resp]]
             [clj-http.client :as client]))
 
 (defn restful-mock-url

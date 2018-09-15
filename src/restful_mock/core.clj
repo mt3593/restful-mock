@@ -2,11 +2,11 @@
   (:require [clojure.spec.alpha :as s]
             [ring.core.spec :as ring-spec]
             [ring.adapter.jetty :as jetty]
+            [restful-mock.request-response-pred :refer [expected-calls-and-responses->req-resp-preds
+                                                        satisfied?]]
             [restful-mock.handler-pred :refer [handler-component
                                                container-handler
-                                               get-unexpected-requests
-                                               expected-calls-and-responses->req-resp-preds
-                                               satisfied?]]))
+                                               get-unexpected-requests]]))
 
 (def ^:dynamic *restful-port* 8081)
 
