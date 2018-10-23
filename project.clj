@@ -7,4 +7,5 @@
                  [ring/ring-core "1.6.3"]
                  [ring/ring-jetty-adapter "1.7.0-RC1"]
                  [org.clojure/test.check "0.9.0"]
-                 [clj-http "3.9.0"]])
+                 [clj-http "3.9.0"]]
+  :profiles {:dev {:dependencies [[ring/ring-mock "0.3.2"]]}})

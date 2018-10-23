@@ -7,11 +7,6 @@
 (s/def :restful-mock/mock-response
   (s/keys :opt-un [:ring.response/status]))
 
-(s/def :restful-mock/list-of-mock-request-response-spec
-  (s/*
-   (s/cat :request :restful-mock/pred-request
-          :response :restful-mock/mock-response)))
-
 (defprotocol RequestResponsePred
   (my-request? [this request])
   (give-response [this])
@@ -39,11 +34,10 @@
   (get-raw-req-resp [this]
     [expected-request response]))
 
-(defn- req-resp->fn
+(defn req-resp->fn
   [[expected-request mock-response]]
+  {:pre [(s/valid? :restful-mock/pred-request expected-request)
+         (s/valid? :restful-mock/mock-response mock-response)]}
   (->SimpleRequestResponsePred expected-request mock-response (atom 0)))
 
-(defn expected-calls-and-responses->req-resp-preds
-  [expected-calls-and-responses]
-  {:pre [(s/valid? :restful-mock/list-of-mock-request-response-spec expected-calls-and-responses)]}
-  (map req-resp->fn (partition 2 expected-calls-and-responses)))
+
